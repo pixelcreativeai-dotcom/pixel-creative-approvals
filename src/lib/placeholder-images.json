@@ -1,3 +1,58 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "user-avatar-1",
+      "description": "User avatar 1",
+      "imageUrl": "https://images.unsplash.com/photo-1521146764736-56c929d59c83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBmYWNlfGVufDB8fHx8MTc2MDk4MTIyOHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person face"
+    },
+    {
+      "id": "user-avatar-2",
+      "description": "User avatar 2",
+      "imageUrl": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHx3b21hbiUyMGZhY2V8ZW58MHx8fHwxNzYxMDM1MjcxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman face"
+    },
+    {
+      "id": "user-avatar-3",
+      "description": "User avatar 3",
+      "imageUrl": "https://images.unsplash.com/photo-1583692331507-fc0bd348695d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxtYW4lMjBmYWNlfGVufDB8fHx8MTc2MTAyNDUxNXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "man face"
+    },
+    {
+      "id": "user-avatar-4",
+      "description": "User avatar 4",
+      "imageUrl": "https://images.unsplash.com/photo-1600180758890-6b94519a8ba6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjEwMzE4OTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "client-logo-1",
+      "description": "Client logo 1",
+      "imageUrl": "https://images.unsplash.com/photo-1496200186974-4293800e2c20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjb21wYW55JTIwbG9nb3xlbnwwfHx8fDE3NjEwMjIyOTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "company logo"
+    },
+    {
+      "id": "campaign-thumbnail-1",
+      "description": "Summer sale campaign thumbnail",
+      "imageUrl": "https://images.unsplash.com/photo-1624281043172-16ff234c2a14?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxzdW1tZXIlMjBmYXNoaW9ufGVufDB8fHx8MTc2MTA1NDI2M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "summer fashion"
+    },
+    {
+      "id": "campaign-thumbnail-2",
+      "description": "New product launch campaign thumbnail",
+      "imageUrl": "https://images.unsplash.com/photo-1646621407632-fad74257fd68?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx0ZWNoJTIwcHJvZHVjdHxlbnwwfHx8fDE3NjEwMzE3MjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tech product"
+    },
+    {
+      "id": "campaign-thumbnail-3",
+      "description": "Brand awareness campaign thumbnail",
+      "imageUrl": "https://images.unsplash.com/photo-1618331833071-ce81bd50d300?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxhYnN0cmFjdCUyMGFydHxlbnwwfHx8fDE3NjEwNDA5NzR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract art"
+    },
+    {
+      "id": "asset-upload-preview",
+      "description": "A placeholder image for asset upload preview",
+      "imageUrl": "https://images.unsplash.com/photo-1613462537927-5e50fb73bdf0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxtYXJrZXRpbmclMjBjcmVhdGl2ZXxlbnwwfHx8fDE3NjEwODE5NTF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "marketing creative"
+    }
+  ]
 }
