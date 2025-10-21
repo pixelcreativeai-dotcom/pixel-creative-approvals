@@ -44,6 +44,20 @@ export interface Creative {
     updatedAt: string;
 }
 
+export type VariationStatus = 'draft' | 'review' | 'approved' | 'changes';
+export type AssetType = 'image' | 'video';
+
+export interface Variation {
+  id: string;
+  creativeId: string;
+  formatKey: string;
+  assetType: AssetType;
+  assetUrl: string;
+  status: VariationStatus;
+  updatedAt: string;
+}
+
+
 export const mockUsers: User[] = [
   { id: 'user-1', name: 'Alicia Rodriguez', avatarUrl: imageMap.get('user-avatar-1')?.imageUrl ?? '', role: 'admin' },
   { id: 'user-2', name: 'Ben Carter', avatarUrl: imageMap.get('user-avatar-2')?.imageUrl ?? '', role: 'designer' },
@@ -97,10 +111,17 @@ export const mockCampaigns: Campaign[] = [
 ];
 
 export const mockCreatives: Creative[] = [
-    { id: 'creative-1', campaignId: 'camp-1', title: 'IG Stories - Anuncio Principal', description: 'Historias para Instagram con enfoque en el producto estrella.', platform: 'instagram', status: 'review', assetCount: 3, updatedAt: '2024-07-28' },
-    { id: 'creative-2', campaignId: 'camp-1', title: 'Google Display Ads', description: 'Banners para la red de display de Google.', platform: 'google', status: 'draft', assetCount: 5, updatedAt: '2024-07-29' },
-    { id: 'creative-3', campaignId: 'camp-2', title: 'TikTok - Video Viral', description: 'Video corto para la campaña de branding en TikTok.', platform: 'tiktok', status: 'approved', assetCount: 1, updatedAt: '2024-07-25' },
+    { id: 'creative-1', campaignId: 'camp-1', title: 'IG Stories - Anuncio Principal', description: 'Historias para Instagram con enfoque en el producto estrella de la temporada de verano. Deben ser vibrantes y captar la atención rápidamente.', platform: 'instagram', status: 'review', assetCount: 3, updatedAt: '2024-07-28' },
+    { id: 'creative-2', campaignId: 'camp-1', title: 'Google Display Ads', description: 'Banners estáticos y responsivos para la red de display de Google, cubriendo los principales formatos.', platform: 'google', status: 'draft', assetCount: 5, updatedAt: '2024-07-29' },
+    { id: 'creative-3', campaignId: 'camp-2', title: 'TikTok - Video Viral', description: 'Video corto para la campaña de branding en TikTok, buscando un enfoque orgánico y de tendencia.', platform: 'tiktok', status: 'approved', assetCount: 1, updatedAt: '2024-07-25' },
 ];
+
+export const mockVariations: Variation[] = [
+    { id: 'var-1', creativeId: 'creative-1', formatKey: 'Stories/Reels 9:16', assetType: 'video', assetUrl: 'https://storage.googleapis.com/pixel-creative-assets-demo/summer-reel.mp4', status: 'review', updatedAt: '2024-07-28' },
+    { id: 'var-2', creativeId: 'creative-1', formatKey: 'Feed 4:5', assetType: 'image', assetUrl: imageMap.get('campaign-thumbnail-1')?.imageUrl ?? '', status: 'approved', updatedAt: '2024-07-27' },
+    { id: 'var-3', creativeId: 'creative-1', formatKey: 'Feed 1:1', assetType: 'image', assetUrl: imageMap.get('campaign-thumbnail-1')?.imageUrl ?? '', status: 'changes', updatedAt: '2024-07-28' },
+];
+
 
 export const formatSpecs = [
     // Meta / IG / FB

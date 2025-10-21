@@ -33,7 +33,7 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useSidebar, SidebarTrigger } from '@/components/ui/sidebar';
 import { DashboardSidebar } from './sidebar';
-import { mockClients } from '@/lib/data';
+import { mockClients, mockCampaigns, mockCreatives } from '@/lib/data';
 
 function BreadcrumbResponsive() {
     const pathname = usePathname();
@@ -42,6 +42,7 @@ function BreadcrumbResponsive() {
     const segmentToSpanish: { [key: string]: string } = {
         'campaigns': 'Campañas',
         'clients': 'Clientes',
+        'creatives': 'Creativos',
         'tools': 'Herramientas',
         'format-validator': 'Validador de Formatos',
     }
@@ -62,10 +63,15 @@ function BreadcrumbResponsive() {
               
               let name = segmentToSpanish[segment] || segment;
               
-              // Find client name for dynamic segment
               if (segments[index-1] === 'clients' && !segmentToSpanish[segment]) {
                 const client = mockClients.find(c => c.id === segment);
                 if(client) name = client.name;
+              } else if (segments[index-1] === 'campaigns' && !segmentToSpanish[segment]) {
+                const campaign = mockCampaigns.find(c => c.id === segment);
+                if(campaign) name = campaign.name;
+              } else if (segments[index-1] === 'creatives' && !segmentToSpanish[segment]) {
+                const creative = mockCreatives.find(c => c.id === segment);
+                if(creative) name = creative.title;
               }
 
 

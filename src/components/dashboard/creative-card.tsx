@@ -1,3 +1,5 @@
+'use client';
+
 import type { Creative } from '@/lib/data';
 import Link from 'next/link';
 import {
@@ -31,7 +33,7 @@ const statusConfig: Record<
 };
 
 export function CreativeCard({ creative }: { creative: Creative }) {
-  const { title, description, status, assetCount, updatedAt } = creative;
+  const { id, title, description, status, assetCount, updatedAt } = creative;
   const config = statusConfig[status] || { label: 'Desconocido', className: 'bg-gray-200 text-gray-800' };
 
   return (
@@ -39,7 +41,7 @@ export function CreativeCard({ creative }: { creative: Creative }) {
       <CardHeader>
         <div className="flex justify-between items-start">
             <CardTitle className="text-lg">
-                <Link href={`#`} className="hover:underline">
+                <Link href={`/creatives/${id}`} className="hover:underline">
                     {title}
                 </Link>
             </CardTitle>
