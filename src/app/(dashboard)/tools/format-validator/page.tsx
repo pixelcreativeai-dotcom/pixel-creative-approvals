@@ -9,19 +9,54 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { formatSpecs, type FormatSpec } from '@/lib/data';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { formatSpecs } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { validateAsset, type ValidateAssetInput, type ValidateAssetOutput } from '@/ai/flows/validate-asset-specifications';
-import { suggestCreativeCropping, type SuggestCreativeCroppingInput, type SuggestCreativeCroppingOutput } from '@/ai/flows/suggest-creative-cropping';
+import { suggestCreativeCropping, type SuggestCreativeCroppingInput } from '@/ai/flows/suggest-creative-cropping';
 
 type ValidationResult = {
   isValid: boolean;
   message: string;
 };
 
-const placeholderImage = PlaceHolderImages.find(p => p.id === 'asset-upload-preview');
+const getFileDimensions = (file: File): Promise<{ width: number; height: number }> => {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    if (file.type.startsWith('image/')) {
+      const img = new Image();
+      img.onload = () => {
+        resolve({ width: img.width, height: img.height });
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = () => {
+        reject(new Error('No se pudieron leer las dimensiones de la imagen.'));
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    } else if (file.type.startsWith('video/')) {
+      const video = document.createElement('video');
+      video.onloadedmetadata = () => {
+        resolve({ width: video.videoWidth, height: video.videoHeight });
+        URL.revokeObjectURL(url);
+      };
+      video.onerror = () => {
+        reject(new Error('No se pudieron leer las dimensiones del video.'));
+        URL.revokeObjectURL(url);
+      };
+      video.src = url;
+    } else {
+      reject(new Error('Tipo de archivo no soportado para obtener dimensiones.'));
+    }
+  });
+};
+
+const toBase64 = (file: File) => new Promise<string>((resolve, reject) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = () => resolve(reader.result as string);
+  reader.onerror = error => reject(error);
+});
+
 
 export default function FormatValidatorPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -33,13 +68,6 @@ export default function FormatValidatorPage() {
   const [suggestions, setSuggestions] = useState<Record<string, string>>({});
 
   const { toast } = useToast();
-
-  const toBase64 = (file: File) => new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = error => reject(error);
-  });
 
   const onDrop = useCallback((acceptedFiles: File[], fileRejections: any[]) => {
     if (fileRejections.length > 0) {
@@ -81,6 +109,42 @@ export default function FormatValidatorPage() {
     setValidationResults(null);
     setSuggestions({});
   };
+  
+  const validateFile = async (file: File, formatKey: string): Promise<ValidationResult> => {
+    const spec = formatSpecs.find(s => s.name === formatKey);
+    if (!spec) {
+      return { isValid: false, message: 'Especificación de formato no encontrada.' };
+    }
+
+    // 1. Validar tamaño máximo
+    if (spec.maxSizeKB && file.size > spec.maxSizeKB * 1024) {
+      return { isValid: false, message: `El archivo es demasiado grande. Máximo: ${spec.maxSizeKB} KB, actual: ${(file.size / 1024).toFixed(2)} KB.` };
+    }
+
+    try {
+      // 2. Validar dimensiones y aspect ratio
+      const { width, height } = await getFileDimensions(file);
+      const idealWidth = parseInt(spec.ideal.split('x')[0], 10);
+      const idealHeight = parseInt(spec.ideal.split('x')[1], 10);
+      
+      const fileRatio = (width / height).toFixed(2);
+      const specRatioParts = spec.ratio.split(':');
+      const specRatio = (parseInt(specRatioParts[0], 10) / parseInt(specRatioParts[1], 10)).toFixed(2);
+
+      if (width !== idealWidth || height !== idealHeight) {
+          return { isValid: false, message: `Dimensiones incorrectas. Esperado: ${spec.ideal}, actual: ${width}x${height}.`};
+      }
+      
+      if (fileRatio !== specRatio) {
+          return { isValid: false, message: `Aspect ratio incorrecto. Esperado: ${spec.ratio} (~${specRatio}), actual: ~${fileRatio}.`};
+      }
+
+      return { isValid: true, message: 'El asset cumple con las especificaciones.' };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Error desconocido al validar el archivo.';
+      return { isValid: false, message };
+    }
+  };
 
   const handleValidate = async () => {
     if (!file || selectedFormats.length === 0) {
@@ -96,37 +160,13 @@ export default function FormatValidatorPage() {
     setValidationResults(null);
     setSuggestions({});
 
-    try {
-      const assetDataUri = await toBase64(file);
-      const relevantFormatSpecs = formatSpecs
-          .filter(spec => selectedFormats.includes(spec.name))
-          .map(spec => ({
-              name: spec.name,
-              width: parseInt(spec.ideal.split('x')[0], 10),
-              height: parseInt(spec.ideal.split('x')[1], 10),
-              ratio: spec.ratio,
-              maxSizeKB: spec.maxSizeKB || 0,
-          }));
-
-      const input: ValidateAssetInput = {
-        assetDataUri,
-        assetSizeBytes: file.size,
-        formatSpecs: relevantFormatSpecs,
-      };
-
-      const response: ValidateAssetOutput = await validateAsset(input);
-      setValidationResults(response.results);
-
-    } catch (error) {
-        console.error("Validation error:", error);
-        toast({
-            variant: "destructive",
-            title: "Error de Validación",
-            description: "No se pudo validar el asset. Inténtalo de nuevo.",
-        });
-    } finally {
-        setIsLoading(false);
+    const results: Record<string, ValidationResult> = {};
+    for (const formatName of selectedFormats) {
+        results[formatName] = await validateFile(file, formatName);
     }
+    
+    setValidationResults(results);
+    setIsLoading(false);
   };
 
   const handleGetSuggestion = async (formatName: string) => {
@@ -143,7 +183,7 @@ export default function FormatValidatorPage() {
             formatSpecs: `${formatSpec.platform}: ${formatSpec.name} ${formatSpec.spec}`
         };
 
-        const response: SuggestCreativeCroppingOutput = await suggestCreativeCropping(input);
+        const response = await suggestCreativeCropping(input);
         setSuggestions(prev => ({...prev, [formatName]: response.suggestions}));
     } catch (error) {
         console.error("Suggestion error:", error);
@@ -249,7 +289,7 @@ export default function FormatValidatorPage() {
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Validando...
             </>
-          ) : 'Validar con IA'}
+          ) : 'Validar Asset'}
         </Button>
 
         {validationResults && (
@@ -268,7 +308,7 @@ export default function FormatValidatorPage() {
                         {!result.isValid && (
                             <div className="mt-2 text-right">
                                 {suggestions[format] ? (
-                                     <Alert className="mt-2 text-left">
+                                     <Alert className="mt-2 text-left bg-background">
                                         <Sparkles className="h-4 w-4" />
                                         <AlertTitle>Sugerencia IA</AlertTitle>
                                         <AlertDescription>
@@ -278,7 +318,7 @@ export default function FormatValidatorPage() {
                                 ) : (
                                     <Button size="sm" variant="outline" onClick={() => handleGetSuggestion(format)} disabled={isSuggesting}>
                                         {isSuggesting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                                        Obtener Sugerencia
+                                        Obtener Sugerencia IA
                                     </Button>
                                 )}
                             </div>
@@ -292,3 +332,5 @@ export default function FormatValidatorPage() {
     </div>
   );
 }
+
+    
