@@ -1,3 +1,5 @@
+'use client';
+import { useState, useEffect } from 'react';
 import type { Campaign, CampaignStatus } from '@/lib/data';
 import Link from 'next/link';
 import {
@@ -34,6 +36,11 @@ const statusConfig: Record<
 export function CampaignCard({ campaign }: { campaign: Campaign }) {
   const { name, client, status, progress, team, dueDate } = campaign;
   const config = statusConfig[status];
+  const [formattedDate, setFormattedDate] = useState('');
+
+  useEffect(() => {
+    setFormattedDate(new Date(dueDate).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' }));
+  }, [dueDate]);
 
   return (
     <Card className="flex flex-col transition-all hover:shadow-md">
@@ -78,7 +85,7 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <CalendarIcon className="h-4 w-4" />
-          <span>{new Date(dueDate).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })}</span>
+          {formattedDate ? <span>{formattedDate}</span> : null}
         </div>
       </CardFooter>
     </Card>

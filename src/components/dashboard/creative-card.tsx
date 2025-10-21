@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import type { Creative } from '@/lib/data';
 import Link from 'next/link';
 import {
@@ -36,6 +37,12 @@ export function CreativeCard({ creative }: { creative: Creative }) {
   const { id, title, description, status, assetCount, updatedAt } = creative;
   const config = statusConfig[status] || { label: 'Desconocido', className: 'bg-gray-200 text-gray-800' };
 
+  const [formattedDate, setFormattedDate] = useState('');
+
+  useEffect(() => {
+    setFormattedDate(new Date(updatedAt).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' }));
+  }, [updatedAt]);
+
   return (
     <Card className="flex flex-col transition-all hover:shadow-md">
       <CardHeader>
@@ -63,7 +70,7 @@ export function CreativeCard({ creative }: { creative: Creative }) {
       <CardFooter className="flex justify-end items-center">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Clock className="h-4 w-4" />
-          <span>Actualizado {new Date(updatedAt).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })}</span>
+          {formattedDate ? <span>Actualizado {formattedDate}</span> : null}
         </div>
       </CardFooter>
     </Card>
