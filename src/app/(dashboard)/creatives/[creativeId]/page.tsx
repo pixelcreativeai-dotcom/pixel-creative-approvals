@@ -47,7 +47,7 @@ export default function CreativeDetailPage({ params }: { params: { creativeId: s
                     <span>Nueva Variación</span>
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[800px]">
+            <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Crear Nueva Variación</DialogTitle>
                 </DialogHeader>

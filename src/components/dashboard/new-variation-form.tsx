@@ -13,6 +13,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  Form
 } from '@/components/ui/form';
 import {
     Select,
@@ -69,7 +70,7 @@ export function NewVariationForm({ creative, onFormSubmit }: NewVariationFormPro
 
 
   return (
-    <FormProvider {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
@@ -109,6 +110,6 @@ export function NewVariationForm({ creative, onFormSubmit }: NewVariationFormPro
             </Button>
         </div>
       </form>
-    </FormProvider>
+    </Form>
   );
 }
