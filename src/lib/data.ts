@@ -30,6 +30,17 @@ export interface Campaign {
   progress: number;
 }
 
+export interface Creative {
+    id: string;
+    campaignId: string;
+    title: string;
+    description: string;
+    platform: 'meta' | 'instagram' | 'facebook' | 'tiktok' | 'google';
+    status: 'draft' | 'review' | 'approved' | 'changes';
+    assetCount: number;
+    updatedAt: string;
+}
+
 export const mockUsers: User[] = [
   { id: 'user-1', name: 'Alicia Rodriguez', avatarUrl: imageMap.get('user-avatar-1')?.imageUrl ?? '', role: 'admin' },
   { id: 'user-2', name: 'Ben Carter', avatarUrl: imageMap.get('user-avatar-2')?.imageUrl ?? '', role: 'designer' },
@@ -82,18 +93,35 @@ export const mockCampaigns: Campaign[] = [
   },
 ];
 
+export const mockCreatives: Creative[] = [
+    { id: 'creative-1', campaignId: 'camp-1', title: 'IG Stories - Anuncio Principal', description: 'Historias para Instagram con enfoque en el producto estrella.', platform: 'instagram', status: 'review', assetCount: 3, updatedAt: '2024-07-28' },
+    { id: 'creative-2', campaignId: 'camp-1', title: 'Google Display Ads', description: 'Banners para la red de display de Google.', platform: 'google', status: 'draft', assetCount: 5, updatedAt: '2024-07-29' },
+    { id: 'creative-3', campaignId: 'camp-2', title: 'TikTok - Video Viral', description: 'Video corto para la campaña de branding en TikTok.', platform: 'tiktok', status: 'approved', assetCount: 1, updatedAt: '2024-07-25' },
+];
+
 export const formatSpecs = [
-    { platform: 'Meta/IG', name: 'Feed 1:1', spec: '1440x1440' },
-    { platform: 'Meta/IG', name: 'Feed 4:5', spec: '1440x1800' },
-    { platform: 'Meta/IG', name: 'Stories/Reels 9:16', spec: '1080x1920' },
-    { platform: 'Meta/IG', name: 'Carrusel 1:1', spec: '1080x1080' },
-    { platform: 'Google Ads', name: 'Landscape 1.91:1', spec: '1200x628' },
-    { platform: 'Google Ads', name: 'Square 1:1', spec: '1200x1200' },
-    { platform: 'Google Ads', name: 'Vertical 4:5', spec: '960x1200' },
-    { platform: 'Google Ads', name: 'Logo 1:1', spec: '1200x1200' },
-    { platform: 'Google Ads', name: 'Logo 4:1', spec: '1200x300' },
-    { platform: 'Google Ads', name: 'Banner 300x250', spec: '300x250' },
-    { platform: 'Google Ads', name: 'Banner 728x90', spec: '728x90' },
-    { platform: 'TikTok', name: 'In-Feed 9:16', spec: '1080x1920' },
-    { platform: 'TikTok', name: 'Thumbnail 1:1', spec: '1080x1080' },
+    // Meta / IG / FB
+    { platform: 'Meta/IG/FB', name: 'Feed 1:1', spec: '1440x1440', ideal: '1440x1440', min: '600x600', ratio: '1:1' },
+    { platform: 'Meta/IG/FB', name: 'Feed 4:5', spec: '1440x1800', ideal: '1440x1800', ratio: '4:5' },
+    { platform: 'Meta/IG/FB', name: 'Stories/Reels 9:16', spec: '1080x1920+', ideal: '1080x1920', ratio: '9:16' },
+    { platform: 'Meta/IG/FB', name: 'Carrusel 1:1', spec: '≥1080x1080', ideal: '1080x1080', min: '1080x1080', ratio: '1:1' },
+    
+    // Google Ads (Responsive Display)
+    { platform: 'Google Ads', name: 'Horizontal 1.91:1', spec: '1200x628', ideal: '1200x628', min: '600x314', ratio: '1.91:1' },
+    { platform: 'Google Ads', name: 'Cuadrado 1:1', spec: '1200x1200', ideal: '1200x1200', min: '300x300', ratio: '1:1' },
+    { platform: 'Google Ads', name: 'Vertical 4:5', spec: '960x1200', ideal: '960x1200', min: '480x600', ratio: '4:5' },
+    { platform: 'Google Ads', name: 'Logo 1:1', spec: '1200x1200', ideal: '1200x1200', min: '128x128', ratio: '1:1' },
+    { platform: 'Google Ads', name: 'Logo 4:1', spec: '1200x300', ideal: '1200x300', min: '512x128', ratio: '4:1' },
+    
+    // Google Ads (Banners estáticos)
+    { platform: 'Google Ads', name: 'Banner 300x250', spec: '300x250', ideal: '300x250', maxSizeKB: 150 },
+    { platform: 'Google Ads', name: 'Banner 336x280', spec: '336x280', ideal: '336x280', maxSizeKB: 150 },
+    { platform: 'Google Ads', name: 'Banner 728x90', spec: '728x90', ideal: '728x90', maxSizeKB: 150 },
+    { platform: 'Google Ads', name: 'Banner 160x600', spec: '160x600', ideal: '160x600', maxSizeKB: 150 },
+    { platform: 'Google Ads', name: 'Banner 300x600', spec: '300x600', ideal: '300x600', maxSizeKB: 150 },
+    { platform: 'Google Ads', name: 'Banner 970x250', spec: '970x250', ideal: '970x250', maxSizeKB: 150 },
+    
+    // TikTok
+    { platform: 'TikTok', name: 'In-Feed 9:16', spec: '1080x1920', ideal: '1080x1920', ratio: '9:16' },
+    { platform: 'TikTok', name: 'Thumbnail 1:1', spec: '1080x1080', ideal: '1080x1080', ratio: '1:1' },
 ];
