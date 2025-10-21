@@ -1,12 +1,12 @@
 
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useDropzone } from 'react-dropzone';
-import { Creative, formatSpecs } from '@/lib/data';
+import { Creative, formatSpecs, type Variation } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import {
   FormControl,
@@ -27,7 +27,6 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, UploadCloud, FileCheck2, AlertCircle, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { validateAsset, type ValidateAssetInput, type ValidateAssetOutput } from '@/ai/flows/validate-asset-specifications';
 import { suggestCreativeCropping, type SuggestCreativeCroppingInput } from '@/ai/flows/suggest-creative-cropping';
 
 const newVariationSchema = z.object({
@@ -39,23 +38,49 @@ const newVariationSchema = z.object({
 
 type NewVariationFormValues = z.infer<typeof newVariationSchema>;
 
-interface NewVariationFormProps {
-  creative: Creative;
-  onFormSubmit: () => void;
+interface ValidationResult {
+    isValid: boolean;
+    message: string;
+    width?: number;
+    height?: number;
+    sizeKB?: number;
+    aspectRatio?: string;
 }
 
-const toBase64 = (file: File) => new Promise<string>((resolve, reject) => {
-  const reader = new FileReader();
-  reader.readAsDataURL(file);
-  reader.onload = () => resolve(reader.result as string);
-  reader.onerror = error => reject(error);
-});
+interface NewVariationFormProps {
+  creative: Creative;
+  onFormSubmit: (newVariation: Variation) => void;
+}
+
+const getAssetDimensions = (file: File): Promise<{ width: number; height: number }> => {
+    return new Promise((resolve, reject) => {
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = new Image();
+                img.onload = () => resolve({ width: img.width, height: img.height });
+                img.onerror = reject;
+                img.src = e.target?.result as string;
+            };
+            reader.readAsDataURL(file);
+        } else if (file.type.startsWith('video/')) {
+            const video = document.createElement('video');
+            video.onloadedmetadata = () => {
+                resolve({ width: video.videoWidth, height: video.videoHeight });
+            };
+            video.onerror = reject;
+            video.src = URL.createObjectURL(file);
+        } else {
+            reject(new Error('Tipo de archivo no soportado para obtener dimensiones.'));
+        }
+    });
+};
 
 
 export function NewVariationForm({ creative, onFormSubmit }: NewVariationFormProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [isSuggesting, setIsSuggesting] = useState(false);
-  const [validationResult, setValidationResult] = useState<ValidateAssetOutput['results'] | null>(null);
+  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
   const [suggestion, setSuggestion] = useState<string | null>(null);
 
   const { toast } = useToast();
@@ -66,9 +91,10 @@ export function NewVariationForm({ creative, onFormSubmit }: NewVariationFormPro
 
   const selectedFormatKey = form.watch('formatKey');
   const uploadedFile = form.watch('asset');
-
+  
   const handleFileChange = useCallback(async (file: File | null) => {
     if (!file) return;
+    
     form.setValue('asset', file, { shouldValidate: true });
     setValidationResult(null);
     setSuggestion(null);
@@ -80,40 +106,48 @@ export function NewVariationForm({ creative, onFormSubmit }: NewVariationFormPro
         return;
     }
 
-    setIsLoading(true);
+    setIsProcessing(true);
     try {
         const spec = formatSpecs.find(s => s.name === formatKey);
         if (!spec) {
-            setValidationResult({[formatKey]: { isValid: false, message: 'Especificación no encontrada.' }});
+            setValidationResult({ isValid: false, message: 'Especificación no encontrada.' });
             return;
         }
 
-        const assetDataUri = await toBase64(file);
-        const input: ValidateAssetInput = {
-            assetDataUri,
-            assetSizeBytes: file.size,
-            formatSpecs: [{
-                name: spec.name,
-                width: parseInt(spec.ideal.split('x')[0]),
-                height: parseInt(spec.ideal.split('x')[1]),
-                ratio: spec.ratio,
-                maxSizeKB: spec.maxSizeKB || 5120
-            }]
-        };
+        const { width, height } = await getAssetDimensions(file);
+        const sizeKB = file.size / 1024;
+        const assetAspectRatio = (width / height).toFixed(2);
+        
+        const specRatioValue = eval(spec.ratio.replace(':', '/')).toFixed(2);
+        const [specWidth, specHeight] = spec.ideal.split('x').map(Number);
+        
+        let isValid = true;
+        let message = 'El asset cumple con las especificaciones.';
 
-        const response = await validateAsset(input);
-        setValidationResult(response.results);
+        if (width !== specWidth || height !== specHeight) {
+            isValid = false;
+            message = `Dimensiones no coinciden. Esperado: ${spec.ideal}, actual: ${width}x${height}.`;
+        } else if (assetAspectRatio !== specRatioValue) {
+            isValid = false;
+            message = `Aspect ratio no coincide. Esperado: ${spec.ratio}, actual: ~${assetAspectRatio}:1.`;
+        } else if (spec.maxSizeKB && sizeKB > spec.maxSizeKB) {
+            isValid = false;
+            message = `El archivo es muy pesado. Máximo: ${spec.maxSizeKB} KB, actual: ${sizeKB.toFixed(0)} KB.`;
+        }
+        
+        setValidationResult({ isValid, message, width, height, sizeKB, aspectRatio: assetAspectRatio });
+
     } catch (error) {
         console.error("Validation error:", error);
         toast({
             variant: "destructive",
-            title: "Error de Validación IA",
-            description: "No se pudo validar el asset. Por favor, intenta de nuevo.",
+            title: "Error de Validación",
+            description: "No se pudo validar el asset localmente. Por favor, intenta de nuevo.",
         });
+        setValidationResult({ isValid: false, message: 'Error al procesar el archivo.' });
     } finally {
-        setIsLoading(false);
+        setIsProcessing(false);
     }
-
   }, [form, toast]);
 
 
@@ -126,7 +160,7 @@ export function NewVariationForm({ creative, onFormSubmit }: NewVariationFormPro
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     multiple: false,
-    accept: { 'image/*': ['.jpeg', '.png', '.webp'], 'video/*': ['.mp4'] }
+    accept: { 'image/jpeg': [], 'image/png': [], 'image/webp': [], 'video/mp4': [] }
   });
 
 
@@ -136,18 +170,22 @@ export function NewVariationForm({ creative, onFormSubmit }: NewVariationFormPro
     setIsSuggesting(true);
     setSuggestion(null);
     try {
-        const assetDataUri = await toBase64(uploadedFile);
-        const formatSpec = formatSpecs.find(f => f.name === selectedFormatKey);
-        if (!formatSpec) return;
+        const reader = new FileReader();
+        reader.readAsDataURL(uploadedFile);
+        reader.onloadend = async () => {
+            const base64data = reader.result as string;
 
-        const input: SuggestCreativeCroppingInput = {
-            assetDataUri,
-            formatSpecs: `${formatSpec.platform}: ${formatSpec.name} ${formatSpec.spec}`
-        };
+            const formatSpec = formatSpecs.find(f => f.name === selectedFormatKey);
+            if (!formatSpec) return;
 
-        const response = await suggestCreativeCropping(input);
-        setSuggestion(response.suggestions);
+            const input: SuggestCreativeCroppingInput = {
+                assetDataUri: base64data,
+                formatSpecs: `${formatSpec.platform}: ${formatSpec.name} ${formatSpec.spec}`
+            };
 
+            const response = await suggestCreativeCropping(input);
+            setSuggestion(response.suggestions);
+        }
     } catch (error) {
         console.error("Suggestion error:", error);
         toast({
@@ -161,33 +199,42 @@ export function NewVariationForm({ creative, onFormSubmit }: NewVariationFormPro
   }
 
 
-  const onSubmit = async (data: NewVariationFormValues) => {
-    const result = validationResult ? validationResult[data.formatKey] : null;
-
-    if (!result || !result.isValid) {
+  const onSubmit = (data: NewVariationFormValues) => {
+    if (!validationResult?.isValid) {
       toast({ variant: 'destructive', title: 'Asset no válido', description: 'El archivo no cumple con las especificaciones del formato seleccionado.'});
       return;
     }
     
-    setIsLoading(true);
-    console.log('Submitting validated data:', data);
+    // Create a new variation object
+    const newVariation: Variation = {
+      id: `var-${Date.now()}`,
+      creativeId: creative.id,
+      formatKey: data.formatKey,
+      assetType: data.asset.type.startsWith('image') ? 'image' : 'video',
+      assetUrl: URL.createObjectURL(data.asset),
+      status: 'draft',
+      updatedAt: new Date().toISOString(),
+    };
     
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
     toast({
-        title: 'Variación Creada (Simulado)',
-        description: `Se ha iniciado la creación de la variación para el formato ${data.formatKey}.`,
+        title: 'Variación Creada',
+        description: `Se ha añadido la variación para el formato ${data.formatKey}.`,
     });
     
-    setIsLoading(false);
-    onFormSubmit();
+    onFormSubmit(newVariation);
   };
+  
+  useEffect(() => {
+    // Reset file and validation when format changes
+    form.resetField('asset');
+    setValidationResult(null);
+    setSuggestion(null);
+  }, [selectedFormatKey, form]);
+
 
   const relevantFormats = formatSpecs.filter(spec => 
     spec.platform.toLowerCase().includes(creative.platform.toLowerCase()) || spec.platform.includes('Meta')
   );
-
-  const currentValidation = validationResult && selectedFormatKey ? validationResult[selectedFormatKey] : null;
 
   return (
     <Form {...form}>
@@ -198,7 +245,7 @@ export function NewVariationForm({ creative, onFormSubmit }: NewVariationFormPro
           render={({ field }) => (
             <FormItem>
               <FormLabel>Formato</FormLabel>
-                <Select onValueChange={(value) => { field.onChange(value); setValidationResult(null); form.resetField('asset'); }} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                         <SelectTrigger>
                             <SelectValue placeholder="1. Selecciona un formato..." />
@@ -254,21 +301,21 @@ export function NewVariationForm({ creative, onFormSubmit }: NewVariationFormPro
           )}
         />
         
-        {isLoading && (
+        {isProcessing && (
              <div className="flex items-center justify-center gap-2 text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Validando asset con IA...</span>
+                <span>Validando asset...</span>
              </div>
         )}
 
-        {currentValidation && (
-            <Alert variant={currentValidation.isValid ? 'default' : 'destructive'}>
-                {currentValidation.isValid ? <FileCheck2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-                <AlertTitle>{currentValidation.isValid ? 'Validación Exitosa' : 'Validación Fallida'}</AlertTitle>
+        {validationResult && !isProcessing && (
+            <Alert variant={validationResult.isValid ? 'default' : 'destructive'}>
+                {validationResult.isValid ? <FileCheck2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                <AlertTitle>{validationResult.isValid ? 'Validación Exitosa' : 'Validación Fallida'}</AlertTitle>
                 <AlertDescription>
-                    {currentValidation.message}
+                    {validationResult.message}
                 </AlertDescription>
-                 {!currentValidation.isValid && (
+                 {!validationResult.isValid && (
                     <div className="mt-4">
                         {suggestion ? (
                              <Alert className="mt-2 text-left bg-background">
@@ -290,8 +337,8 @@ export function NewVariationForm({ creative, onFormSubmit }: NewVariationFormPro
         )}
 
         <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="ghost" onClick={onFormSubmit}>Cancelar</Button>
-            <Button type="submit" disabled={isLoading || !currentValidation?.isValid}>
+            <Button type="button" variant="ghost" onClick={() => onFormSubmit(null as any)}>Cancelar</Button>
+            <Button type="submit" disabled={isProcessing || !validationResult?.isValid}>
               Crear Variación
             </Button>
         </div>

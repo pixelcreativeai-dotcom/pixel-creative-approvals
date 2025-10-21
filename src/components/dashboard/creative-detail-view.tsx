@@ -19,11 +19,17 @@ import type { Creative, Campaign, Variation } from '@/lib/data';
 interface CreativeDetailViewProps {
   creative: Creative;
   campaign: Campaign | undefined;
-  variations: Variation[];
+  initialVariations: Variation[];
 }
 
-export function CreativeDetailView({ creative, campaign, variations }: CreativeDetailViewProps) {
+export function CreativeDetailView({ creative, campaign, initialVariations }: CreativeDetailViewProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [variations, setVariations] = useState<Variation[]>(initialVariations);
+
+  const handleAddVariation = (newVariation: Variation) => {
+    setVariations(prev => [newVariation, ...prev]);
+    setIsModalOpen(false);
+  };
 
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -73,7 +79,7 @@ export function CreativeDetailView({ creative, campaign, variations }: CreativeD
           <DialogHeader>
               <DialogTitle>Crear Nueva Variación</DialogTitle>
           </DialogHeader>
-          <NewVariationForm creative={creative} onFormSubmit={() => setIsModalOpen(false)} />
+          <NewVariationForm creative={creative} onFormSubmit={handleAddVariation} />
       </DialogContent>
     </Dialog>
   );
