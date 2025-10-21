@@ -7,11 +7,11 @@ import {
   Card,
   CardContent,
   CardFooter,
-  CardHeader,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Image as ImageIcon, Video, MoreVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { MetaFeedPreview, InstagramStoryPreview, TikTokPreview } from '@/components/dashboard/previews';
 
 type VariationStatus = 'draft' | 'review' | 'approved' | 'changes';
 
@@ -31,40 +31,29 @@ const statusConfig: Record<
   },
 };
 
+const getPreviewComponent = (formatKey: string, assetType: 'image' | 'video', assetUrl: string) => {
+    const props = { assetUrl, assetType };
+    if (formatKey.toLowerCase().includes('stories') || formatKey.toLowerCase().includes('reels') || formatKey.includes('9:16')) {
+        return <InstagramStoryPreview {...props} />;
+    }
+    if (formatKey.toLowerCase().includes('tiktok')) {
+        return <TikTokPreview {...props} />;
+    }
+    // Default to Meta Feed for other formats like 1:1 or 4:5
+    return <MetaFeedPreview {...props} />;
+}
+
 export function VariationCard({ variation }: { variation: Variation }) {
   const { id, formatKey, assetType, assetUrl, status, updatedAt } = variation;
   const config = statusConfig[status] || { label: 'Desconocido', className: 'bg-gray-200 text-gray-800' };
 
   return (
     <Card className="flex flex-col transition-all hover:shadow-md group">
-      <CardHeader className="p-0">
-        <Link href={`#`} className="block aspect-video relative overflow-hidden rounded-t-lg">
-            {assetType === 'image' ? (
-                <Image 
-                    src={assetUrl}
-                    alt={`Preview for ${formatKey}`}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    data-ai-hint="creative variation"
-                />
-            ) : (
-                <div className="w-full h-full bg-black flex items-center justify-center">
-                    <video 
-                        src={assetUrl}
-                        muted
-                        loop
-                        playsInline
-                        className="w-full h-full object-contain"
-                    />
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                        <Video className="h-12 w-12 text-white/80" />
-                    </div>
-                </div>
-            )}
-        </Link>
-      </CardHeader>
       <CardContent className="p-4 flex-grow">
-        <div className="flex justify-between items-start gap-2">
+        <Link href={`#`} className="block overflow-hidden rounded-md border">
+            {getPreviewComponent(formatKey, assetType, assetUrl)}
+        </Link>
+        <div className="flex justify-between items-start gap-2 mt-4">
             <div>
                 <h3 className="font-semibold leading-tight">{formatKey}</h3>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
