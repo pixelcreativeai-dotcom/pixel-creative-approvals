@@ -1,4 +1,4 @@
-import type { Creative, CampaignStatus } from '@/lib/data';
+import type { Creative } from '@/lib/data';
 import Link from 'next/link';
 import {
   Card,
@@ -12,29 +12,27 @@ import { Badge } from '@/components/ui/badge';
 import { FileText, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+type CreativeStatus = 'draft' | 'review' | 'approved' | 'changes';
+
 const statusConfig: Record<
-  CampaignStatus,
+  CreativeStatus,
   { label: string; className: string }
 > = {
   draft: { label: 'Borrador', className: 'bg-gray-200 text-gray-800' },
-  in_review: {
+  review: {
     label: 'En Revisión',
     className: 'bg-yellow-200 text-yellow-800',
   },
   approved: { label: 'Aprobado', className: 'bg-blue-200 text-blue-800' },
-  completed: { // Reusing campaign statuses for now
-    label: 'Completado',
-    className: 'bg-green-200 text-green-800',
+  changes: {
+    label: 'Con Cambios',
+    className: 'bg-orange-200 text-orange-800',
   },
-  archived: { label: 'Archivado', className: 'bg-gray-400 text-white' },
 };
 
 export function CreativeCard({ creative }: { creative: Creative }) {
   const { title, description, status, assetCount, updatedAt } = creative;
-  // The 'as' is a type assertion needed because creative status can be 'review', which is not in CampaignStatus.
-  // This is a temporary solution.
-  const config = statusConfig[status as 'in_review'];
-
+  const config = statusConfig[status] || { label: 'Desconocido', className: 'bg-gray-200 text-gray-800' };
 
   return (
     <Card className="flex flex-col transition-all hover:shadow-md">
