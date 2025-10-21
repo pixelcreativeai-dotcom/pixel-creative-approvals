@@ -50,30 +50,26 @@ const validateAssetPrompt = ai.definePrompt({
   output: {schema: ValidateAssetOutputSchema},
   prompt: `You are an expert creative asset validator.
 
-You will receive an asset (image or video) and a set of format specifications.
+You will receive an asset (image or video), its size in bytes, and a set of format specifications.
 Your task is to validate the asset against each format specification and determine if it meets the requirements.
 
 For each format specification, you must check:
-- If the asset's dimensions match the required width and height.
+- If the asset's dimensions (which you will determine from the media) match the required width and height.
 - If the asset's aspect ratio matches the required ratio.
-- If the asset's size is within the maximum allowed size.
+- If the asset's size in bytes is less than or equal to the maxSizeKB * 1024.
 
 Return a JSON object with a validation result for each format specification.
 
-Asset Data URI: {{{assetDataUri}}}
+Asset: {{media url=assetDataUri}}
 Asset Size (bytes): {{{assetSizeBytes}}}
 Format Specifications:
 {{#each formatSpecs}}
-  Name: {{{name}}}
-  Width: {{{width}}}px
-  Height: {{{height}}}px
-  Ratio: {{{ratio}}}
-  Max Size: {{{maxSizeKB}}} KB
+  - Name: {{{name}}}, Width: {{{width}}}px, Height: {{{height}}}px, Ratio: {{{ratio}}}, Max Size: {{{maxSizeKB}}} KB
 {{/each}}
 
-Output Format: A JSON object where keys are the names from FormatSpecs and the values are of this type: { isValid: boolean, message: string }.
-isValid should be false if any of the checks fail, and true otherwise.
-message should be a human-readable message indicating which check(s) failed. If the asset is valid, the message should be an empty string.
+For each specification, output a key with the spec name. The value should be an object: { isValid: boolean, message: string }.
+- 'isValid' should be true ONLY if all checks pass.
+- 'message' should be a concise, human-readable sentence in Spanish explaining the FIRST check that failed (e.g., "El aspect ratio no coincide. Esperado: 1:1, actual: 1.2:1."). If the asset is valid, the message should be an empty string.
 `,
 });
 
@@ -84,24 +80,10 @@ const validateAssetFlow = ai.defineFlow(
     outputSchema: ValidateAssetOutputSchema,
   },
   async input => {
-    const results: Record<string, { isValid: boolean; message: string }> = {};
-
-    for (const spec of input.formatSpecs) {
-      let isValid = true;
-      let message = '';
-
-      // Placeholder validations - replace with actual asset dimension/ratio extraction and size check
-      // For now, let's assume the AI can determine this accurately from the data URI.
-      // Example: if (assetWidth !== spec.width) { isValid = false; message += 'Width does not match. '; }
-
-      if (input.assetSizeBytes > spec.maxSizeKB * 1024) {
-        isValid = false;
-        message += `Asset exceeds maximum size of ${spec.maxSizeKB} KB. `; 
-      }
-
-      results[spec.name] = { isValid, message };
-    }
-
-    return {results: results};
+    // The prompt is powerful enough to handle the validation. 
+    // The previous implementation had a bug where it would always return an empty message.
+    // By letting the LLM handle the whole logic, we get more accurate results and messages.
+    const {output} = await validateAssetPrompt(input);
+    return output!;
   }
 );

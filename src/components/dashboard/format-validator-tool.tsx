@@ -13,6 +13,7 @@ import { formatSpecs } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { validateAsset, type ValidateAssetInput, type ValidateAssetOutput } from '@/ai/flows/validate-asset-specifications';
 
 type ValidationResult = {
   isValid: boolean;
@@ -28,6 +29,13 @@ export function FormatValidatorTool() {
   const [validationResults, setValidationResults] = useState<Record<string, ValidationResult> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+  const toBase64 = (file: File) => new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
+  });
 
   const onDrop = useCallback((acceptedFiles: File[], fileRejections: any[]) => {
     if (fileRejections.length > 0) {
@@ -56,6 +64,7 @@ export function FormatValidatorTool() {
       'video/mp4': [],
     },
     maxFiles: 1,
+    maxSize: 200 * 1024 * 1024, // 200MB
   });
 
   const handleFormatChange = (specName: string) => {
@@ -79,20 +88,37 @@ export function FormatValidatorTool() {
     setIsLoading(true);
     setValidationResults(null);
 
-    // Simulate AI validation call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const assetDataUri = await toBase64(file);
+      const relevantFormatSpecs = formatSpecs
+          .filter(spec => selectedFormats.includes(spec.name))
+          .map(spec => ({
+              name: spec.name,
+              width: parseInt(spec.ideal.split('x')[0]),
+              height: parseInt(spec.ideal.split('x')[1]),
+              ratio: spec.ratio,
+              maxSizeKB: spec.maxSizeKB || 0,
+          }));
 
-    const results: Record<string, ValidationResult> = {};
-    selectedFormats.forEach(formatName => {
-      const isSuccess = Math.random() > 0.3; // Simulate success/failure
-      results[formatName] = {
-        isValid: isSuccess,
-        message: isSuccess ? 'El asset cumple con las especificaciones.' : 'El aspect ratio no coincide (esperado 1:1, actual 1.2:1).',
+      const input: ValidateAssetInput = {
+        assetDataUri,
+        assetSizeBytes: file.size,
+        formatSpecs: relevantFormatSpecs,
       };
-    });
-    
-    setValidationResults(results);
-    setIsLoading(false);
+
+      const response: ValidateAssetOutput = await validateAsset(input);
+      setValidationResults(response.results);
+
+    } catch (error) {
+        console.error("Validation error:", error);
+        toast({
+            variant: "destructive",
+            title: "Error de Validación",
+            description: "No se pudo validar el asset. Inténtalo de nuevo.",
+        });
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   const clearFile = () => {
@@ -145,7 +171,7 @@ export function FormatValidatorTool() {
                   ? 'Suelta el archivo aquí'
                   : 'Arrastra y suelta un archivo, o haz clic para seleccionar'}
               </p>
-              <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WebP, MP4</p>
+              <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WebP (max 30MB), MP4 (max 200MB)</p>
             </div>
           )}
         </CardContent>
@@ -199,7 +225,7 @@ export function FormatValidatorTool() {
                     <Alert key={format} variant={result.isValid ? 'default' : 'destructive'}>
                         {result.isValid ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
                         <AlertTitle className="font-headline">{format}</AlertTitle>
-                        <AlertDescription>{result.message}</AlertDescription>
+                        <AlertDescription>{result.message || (result.isValid ? 'El asset cumple con las especificaciones.' : 'No se pudo validar.')}</AlertDescription>
                     </Alert>
                 ))}
                 </CardContent>

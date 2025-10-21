@@ -33,6 +33,7 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useSidebar, SidebarTrigger } from '@/components/ui/sidebar';
 import { DashboardSidebar } from './sidebar';
+import { mockClients } from '@/lib/data';
 
 function BreadcrumbResponsive() {
     const pathname = usePathname();
@@ -58,7 +59,15 @@ function BreadcrumbResponsive() {
           {segments.map((segment, index) => {
               const href = `/${segments.slice(0, index + 1).join('/')}`;
               const isLast = index === segments.length - 1;
-              const name = segmentToSpanish[segment] || segment;
+              
+              let name = segmentToSpanish[segment] || segment;
+              
+              // Find client name for dynamic segment
+              if (segments[index-1] === 'clients' && !segmentToSpanish[segment]) {
+                const client = mockClients.find(c => c.id === segment);
+                if(client) name = client.name;
+              }
+
 
               return (
                   <React.Fragment key={href}>

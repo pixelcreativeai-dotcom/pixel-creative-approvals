@@ -15,7 +15,10 @@ export interface User {
 export interface Client {
   id: string;
   name: string;
+  slug: string;
   logoUrl: string;
+  contactName: string;
+  contactEmail: string;
 }
 
 export type CampaignStatus = 'draft' | 'in_review' | 'approved' | 'completed' | 'archived';
@@ -49,9 +52,9 @@ export const mockUsers: User[] = [
 ];
 
 export const mockClients: Client[] = [
-  { id: 'client-1', name: 'Innovate Inc.', logoUrl: imageMap.get('client-logo-1')?.imageUrl ?? '' },
-  { id: 'client-2', name: 'Quantum Solutions', logoUrl: imageMap.get('client-logo-1')?.imageUrl ?? '' },
-  { id: 'client-3', name: 'Synergy Corp', logoUrl: imageMap.get('client-logo-1')?.imageUrl ?? '' },
+  { id: 'client-1', name: 'Innovate Inc.', slug: 'innovate-inc', logoUrl: imageMap.get('client-logo-1')?.imageUrl ?? '', contactName: 'Laura Evans', contactEmail: 'laura@innovate.com' },
+  { id: 'client-2', name: 'Quantum Solutions', slug: 'quantum-solutions', logoUrl: imageMap.get('client-logo-2')?.imageUrl ?? '', contactName: 'Mark Chen', contactEmail: 'mark@quantum.io' },
+  { id: 'client-3', name: 'Synergy Corp', slug: 'synergy-corp', logoUrl: imageMap.get('client-logo-2')?.imageUrl ?? '', contactName: 'Olivia Wilde', contactEmail: 'olivia@synergy.org' },
 ];
 
 export const mockCampaigns: Campaign[] = [
@@ -101,17 +104,17 @@ export const mockCreatives: Creative[] = [
 
 export const formatSpecs = [
     // Meta / IG / FB
-    { platform: 'Meta/IG/FB', name: 'Feed 1:1', spec: '1440x1440', ideal: '1440x1440', min: '600x600', ratio: '1:1' },
-    { platform: 'Meta/IG/FB', name: 'Feed 4:5', spec: '1440x1800', ideal: '1440x1800', ratio: '4:5' },
-    { platform: 'Meta/IG/FB', name: 'Stories/Reels 9:16', spec: '1080x1920+', ideal: '1080x1920', ratio: '9:16' },
-    { platform: 'Meta/IG/FB', name: 'Carrusel 1:1', spec: '≥1080x1080', ideal: '1080x1080', min: '1080x1080', ratio: '1:1' },
+    { platform: 'Meta/IG/FB', name: 'Feed 1:1', spec: '1440x1440', ideal: '1440x1440', min: '600x600', ratio: '1:1', maxSizeKB: 30000 },
+    { platform: 'Meta/IG/FB', name: 'Feed 4:5', spec: '1440x1800', ideal: '1440x1800', ratio: '4:5', maxSizeKB: 30000 },
+    { platform: 'Meta/IG/FB', name: 'Stories/Reels 9:16', spec: '1080x1920+', ideal: '1080x1920', ratio: '9:16', maxSizeKB: 200000 },
+    { platform: 'Meta/IG/FB', name: 'Carrusel 1:1', spec: '≥1080x1080', ideal: '1080x1080', min: '1080x1080', ratio: '1:1', maxSizeKB: 30000 },
     
     // Google Ads (Responsive Display)
-    { platform: 'Google Ads', name: 'Horizontal 1.91:1', spec: '1200x628', ideal: '1200x628', min: '600x314', ratio: '1.91:1' },
-    { platform: 'Google Ads', name: 'Cuadrado 1:1', spec: '1200x1200', ideal: '1200x1200', min: '300x300', ratio: '1:1' },
-    { platform: 'Google Ads', name: 'Vertical 4:5', spec: '960x1200', ideal: '960x1200', min: '480x600', ratio: '4:5' },
-    { platform: 'Google Ads', name: 'Logo 1:1', spec: '1200x1200', ideal: '1200x1200', min: '128x128', ratio: '1:1' },
-    { platform: 'Google Ads', name: 'Logo 4:1', spec: '1200x300', ideal: '1200x300', min: '512x128', ratio: '4:1' },
+    { platform: 'Google Ads', name: 'Horizontal 1.91:1', spec: '1200x628', ideal: '1200x628', min: '600x314', ratio: '1.91:1', maxSizeKB: 5120 },
+    { platform: 'Google Ads', name: 'Cuadrado 1:1', spec: '1200x1200', ideal: '1200x1200', min: '300x300', ratio: '1:1', maxSizeKB: 5120 },
+    { platform: 'Google Ads', name: 'Vertical 4:5', spec: '960x1200', ideal: '960x1200', min: '480x600', ratio: '4:5', maxSizeKB: 5120 },
+    { platform: 'Google Ads', name: 'Logo 1:1', spec: '1200x1200', ideal: '1200x1200', min: '128x128', ratio: '1:1', maxSizeKB: 5120 },
+    { platform: 'Google Ads', name: 'Logo 4:1', spec: '1200x300', ideal: '1200x300', min: '512x128', ratio: '4:1', maxSizeKB: 5120 },
     
     // Google Ads (Banners estáticos)
     { platform: 'Google Ads', name: 'Banner 300x250', spec: '300x250', ideal: '300x250', maxSizeKB: 150 },
@@ -122,6 +125,6 @@ export const formatSpecs = [
     { platform: 'Google Ads', name: 'Banner 970x250', spec: '970x250', ideal: '970x250', maxSizeKB: 150 },
     
     // TikTok
-    { platform: 'TikTok', name: 'In-Feed 9:16', spec: '1080x1920', ideal: '1080x1920', ratio: '9:16' },
-    { platform: 'TikTok', name: 'Thumbnail 1:1', spec: '1080x1080', ideal: '1080x1080', ratio: '1:1' },
+    { platform: 'TikTok', name: 'In-Feed 9:16', spec: '1080x1920', ideal: '1080x1920', ratio: '9:16', maxSizeKB: 200000 },
+    { platform: 'TikTok', name: 'Thumbnail 1:1', spec: '1080x1080', ideal: '1080x1080', ratio: '1:1', maxSizeKB: 30000 },
 ];

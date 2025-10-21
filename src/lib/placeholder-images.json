@@ -31,6 +31,12 @@
       "imageHint": "company logo"
     },
     {
+      "id": "client-logo-2",
+      "description": "Client logo 2",
+      "imageUrl": "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxjb21wYW55JTIwbG9nb3xlbnwwfHx8fDE3NjEwMjIyOTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "brand logo"
+    },
+    {
       "id": "campaign-thumbnail-1",
       "description": "Summer sale campaign thumbnail",
       "imageUrl": "https://images.unsplash.com/photo-1624281043172-16ff234c2a14?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxzdW1tZXIlMjBmYXNoaW9ufGVufDB8fHx8MTc2MTA1NDI2M3ww&ixlib=rb-4.1.0&q=80&w=1080",
