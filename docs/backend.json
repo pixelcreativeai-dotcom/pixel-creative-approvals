@@ -1,0 +1,477 @@
+{
+  "entities": {
+    "Client": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Client",
+      "type": "object",
+      "description": "Represents a client within the multi-tenant system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Client entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the client."
+        },
+        "slug": {
+          "type": "string",
+          "description": "A unique, human-readable string used in URLs to identify the client."
+        },
+        "logoUrl": {
+          "type": "string",
+          "description": "URL to the client's logo.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "slug"
+      ]
+    },
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user within the system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "clientId": {
+          "type": "string",
+          "description": "Reference to Client. (Relationship: Client 1:N User). Indicates which client this user belongs to."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "role": {
+          "type": "string",
+          "description": "The user's role (e.g., admin, designer, client, viewer)."
+        }
+      },
+      "required": [
+        "id",
+        "clientId",
+        "email",
+        "role"
+      ]
+    },
+    "Campaign": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Campaign",
+      "type": "object",
+      "description": "Represents a marketing campaign.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Campaign entity."
+        },
+        "clientId": {
+          "type": "string",
+          "description": "Reference to Client. (Relationship: Client 1:N Campaign).  Indicates which client this campaign belongs to."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the campaign."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the campaign (e.g., draft, review, approved)."
+        }
+      },
+      "required": [
+        "id",
+        "clientId",
+        "name",
+        "status"
+      ]
+    },
+    "Creative": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Creative",
+      "type": "object",
+      "description": "Represents a creative asset within a campaign.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Creative entity."
+        },
+        "campaignId": {
+          "type": "string",
+          "description": "Reference to Campaign. (Relationship: Campaign 1:N Creative).  Indicates which campaign this creative belongs to."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the creative."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the creative (e.g., draft, review, approved)."
+        }
+      },
+      "required": [
+        "id",
+        "campaignId",
+        "name",
+        "status"
+      ]
+    },
+    "Variation": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Variation",
+      "type": "object",
+      "description": "Represents a specific variation of a creative asset (e.g., different sizes or formats).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Variation entity."
+        },
+        "creativeId": {
+          "type": "string",
+          "description": "Reference to Creative. (Relationship: Creative 1:N Variation).  Indicates which creative this variation belongs to."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the variation (e.g., 1:1, 4:5, 9:16)."
+        },
+        "assetUrl": {
+          "type": "string",
+          "description": "URL to the asset file.",
+          "format": "uri"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the variation (e.g., draft, review, approved)."
+        }
+      },
+      "required": [
+        "id",
+        "creativeId",
+        "name",
+        "assetUrl",
+        "status"
+      ]
+    },
+    "FormatSpec": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FormatSpec",
+      "type": "object",
+      "description": "Represents format specifications for different platforms (e.g., Meta, Google Ads, TikTok).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the FormatSpec entity."
+        },
+        "platform": {
+          "type": "string",
+          "description": "The platform the format specification applies to (e.g., Meta, Google Ads, TikTok)."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the format (e.g., Feed 1:1, Stories/Reels 9:16)."
+        },
+        "width": {
+          "type": "number",
+          "description": "The required width of the asset."
+        },
+        "height": {
+          "type": "number",
+          "description": "The required height of the asset."
+        },
+        "minWidth": {
+          "type": "number",
+          "description": "The minimum width of the asset."
+        },
+        "minHeight": {
+          "type": "number",
+          "description": "The minimum height of the asset."
+        },
+        "ratio": {
+          "type": "string",
+          "description": "The aspect ratio of the asset (e.g., 1:1, 9:16)."
+        },
+        "maxSizeKB": {
+          "type": "number",
+          "description": "The maximum size of the asset in kilobytes."
+        }
+      },
+      "required": [
+        "id",
+        "platform",
+        "name",
+        "width",
+        "height",
+        "ratio"
+      ]
+    },
+    "Comment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Comment",
+      "type": "object",
+      "description": "Represents a comment on a creative variation.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Comment entity."
+        },
+        "variationId": {
+          "type": "string",
+          "description": "Reference to Variation. (Relationship: Variation 1:N Comment).  Indicates which variation this comment belongs to."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. Indicates which user created the comment."
+        },
+        "text": {
+          "type": "string",
+          "description": "The text content of the comment."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The date and time the comment was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "variationId",
+        "userId",
+        "text",
+        "createdAt"
+      ]
+    },
+    "ActivityLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ActivityLog",
+      "type": "object",
+      "description": "Represents an activity log entry for auditing purposes.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ActivityLog entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. Indicates which user performed the activity."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "The date and time the activity occurred.",
+          "format": "date-time"
+        },
+        "action": {
+          "type": "string",
+          "description": "The action that was performed (e.g., create, update, delete)."
+        },
+        "resourceType": {
+          "type": "string",
+          "description": "The type of resource that was affected (e.g., Campaign, Creative, Variation)."
+        },
+        "resourceId": {
+          "type": "string",
+          "description": "The ID of the resource that was affected."
+        },
+        "details": {
+          "type": "string",
+          "description": "Additional details about the activity (e.g., changes made)."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "timestamp",
+        "action",
+        "resourceType",
+        "resourceId"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/clients/{clientId}",
+        "definition": {
+          "entityName": "Client",
+          "schema": {
+            "$ref": "#/backend/entities/Client"
+          },
+          "description": "Stores client information. No subcollections attached here to limit authorization complexity.",
+          "params": [
+            {
+              "name": "clientId",
+              "description": "The unique identifier for the client."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user information, including clientId. The clientId is denormalized from the client document itself.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/clients/{clientId}/campaigns/{campaignId}",
+        "definition": {
+          "entityName": "Campaign",
+          "schema": {
+            "$ref": "#/backend/entities/Campaign"
+          },
+          "description": "Campaigns are nested under clients, enforcing client-specific access. The clientId is implicitly inherited.",
+          "params": [
+            {
+              "name": "clientId",
+              "description": "The unique identifier for the client."
+            },
+            {
+              "name": "campaignId",
+              "description": "The unique identifier for the campaign."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/clients/{clientId}/campaigns/{campaignId}/creatives/{creativeId}",
+        "definition": {
+          "entityName": "Creative",
+          "schema": {
+            "$ref": "#/backend/entities/Creative"
+          },
+          "description": "Creatives nested under campaigns, ensuring client and campaign context. The clientId is implicitly inherited.",
+          "params": [
+            {
+              "name": "clientId",
+              "description": "The unique identifier for the client."
+            },
+            {
+              "name": "campaignId",
+              "description": "The unique identifier for the campaign."
+            },
+            {
+              "name": "creativeId",
+              "description": "The unique identifier for the creative."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/clients/{clientId}/campaigns/{campaignId}/creatives/{creativeId}/variations/{variationId}",
+        "definition": {
+          "entityName": "Variation",
+          "schema": {
+            "$ref": "#/backend/entities/Variation"
+          },
+          "description": "Variations nested under creatives, maintaining hierarchy. The clientId is implicitly inherited.",
+          "params": [
+            {
+              "name": "clientId",
+              "description": "The unique identifier for the client."
+            },
+            {
+              "name": "campaignId",
+              "description": "The unique identifier for the campaign."
+            },
+            {
+              "name": "creativeId",
+              "description": "The unique identifier for the creative."
+            },
+            {
+              "name": "variationId",
+              "description": "The unique identifier for the variation."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/variations/{variationId}/comments/{commentId}",
+        "definition": {
+          "entityName": "Comment",
+          "schema": {
+            "$ref": "#/backend/entities/Comment"
+          },
+          "description": "Comments are placed in a top-level collection for easier querying across the entire database. Includes denormalized 'clientId' and 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "variationId",
+              "description": "The unique identifier for the variation."
+            },
+            {
+              "name": "commentId",
+              "description": "The unique identifier for the comment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/formatSpecs/{formatSpecId}",
+        "definition": {
+          "entityName": "FormatSpec",
+          "schema": {
+            "$ref": "#/backend/entities/FormatSpec"
+          },
+          "description": "Stores reusable format specifications. Access control can be managed at the application level or restricted to admins.",
+          "params": [
+            {
+              "name": "formatSpecId",
+              "description": "The unique identifier for the format specification."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/activityLogs/{activityLogId}",
+        "definition": {
+          "entityName": "ActivityLog",
+          "schema": {
+            "$ref": "#/backend/entities/ActivityLog"
+          },
+          "description": "Stores activity logs for auditing. Includes userId, timestamp, action, resourceType, resourceId, and details.",
+          "params": [
+            {
+              "name": "activityLogId",
+              "description": "The unique identifier for the activity log entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Collection for global admin role management. Existence of a document grants admin privileges.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "This Firestore structure is designed for a multi-tenant application, 'Pixel Creative Approvals', focusing on campaign and creative asset management. The design prioritizes security, scalability, and debuggability using the principles of Authorization Independence, Structural Segregation, and Access Modeling. Authorization Independence is achieved by denormalizing client IDs and user roles into relevant subcollections, avoiding the need for `get()` calls in security rules and enabling atomic operations.\n\n**Explanation of the Structure and Authorization Independence:**\n\n*   **/clients/{clientId}**: Stores client-specific information. No subcollections are directly attached here to limit authorization complexity. `clientId` is central to the multi-tenancy and used in other collections.\n*   **/users/{userId}**: Stores user information, including `clientId` and `role`. The `clientId` is denormalized from the client document itself, enabling atomic user creation and independent authorization.  This is crucial for ensuring users can only access resources associated with their respective clients.\n*   **/clients/{clientId}/campaigns/{campaignId}**: Campaigns are nested under clients, clearly associating each campaign with a specific client.  The `clientId` is implicitly enforced by the collection structure. Security rules can easily validate the `clientId` against the authenticated user's `clientId` to ensure correct access.\n*   **/clients/{clientId}/campaigns/{campaignId}/creatives/{creativeId}**: Creatives are nested under campaigns, further solidifying the client-campaign-creative relationship. The `clientId` is implicitly inherited from the parent `campaignId`. The parent's `clientId` is not explicitly denormalized into the creative document, but that could be if there were cross-campaign creative reuse scenarios, which this data model does not have.\n*   **/clients/{clientId}/campaigns/{campaignId}/creatives/{creativeId}/variations/{variationId}**: Variations are nested under creatives.  Similar to creatives, the `clientId` is implicitly inherited from the parent `creativeId`.\n*   **/variations/{variationId}/comments/{commentId}**: Comments are placed in a top-level collection to allow easier querying across the entire database, and it enables a more flexible security rule structure where rules are not tightly coupled with the nested hierarchy of the variation. To achieve Authorization Independence, each comment MUST contain the `clientId` and `userId` of the user who created the comment. The `variationId` is kept for querying and data retrieval purposes. Security rules can validate the `clientId` of the comment against the user's `clientId` to ensure appropriate authorization.\n*   **/formatSpecs/{formatSpecId}**: Stores reusable format specifications. Access control can be managed at the application level or restricted to admins if needed.\n*   **/activityLogs/{activityLogId}**:  Stores activity logs for auditing.  Each activity log entry includes `userId`, `timestamp`, `action`, `resourceType`, `resourceId`, and `details`. The `clientId` can be added to activity log for more granular auditing, but this would introduce a denormalization requirement.\n*   **/roles_admin/{userId}**: This collection is used for global admin role management. The existence of a document for a `userId` in this collection grants admin privileges.\n\n**QAPs (Rules are not Filters) and Structural Segregation:**\n\n*   The structure enables secure `list` operations by segregating data based on ownership and access requirements. For instance, listing campaigns under a specific client (**/clients/{clientId}/campaigns**) is secure because the security rules only need to verify that the requesting user belongs to that client. Similar principles apply to other subcollections.\n*   Data with different access needs are segregated. Private user data is stored under `/users/{userId}`, while client-specific campaign data is nested under `/clients/{clientId}`. This segregation simplifies security rules and prevents accidental exposure of sensitive data.\n\nThis design provides a solid foundation for a secure, scalable, and maintainable application with clear authorization boundaries."
+  }
+}
