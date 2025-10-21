@@ -1,10 +1,14 @@
-import Link from 'next/link';
+
 import { notFound } from 'next/navigation';
+import { mockCampaigns, mockCreatives } from '@/lib/data';
+import Link from 'next/link';
 import { ArrowLeft, PlusCircle, CheckCircle, Clock, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { mockCampaigns, mockCreatives } from '@/lib/data';
 import { CreativeCard } from '@/components/dashboard/creative-card';
+
+// Esta página ahora es un Server Component por defecto, lo cual es ideal para
+// obtener datos (data fetching).
 
 export default function CampaignDetailPage({ params }: { params: { campaignId: string } }) {
   const campaign = mockCampaigns.find(c => c.id === params.campaignId);
@@ -13,6 +17,9 @@ export default function CampaignDetailPage({ params }: { params: { campaignId: s
   if (!campaign) {
     notFound();
   }
+
+  // El estado y la interactividad se pueden manejar en Client Components más pequeños si es necesario.
+  // Por ahora, esta página es mayormente estática.
 
   return (
     <div className="flex flex-col gap-8">

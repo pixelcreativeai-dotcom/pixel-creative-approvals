@@ -1,19 +1,24 @@
-import Link from 'next/link';
+
 import { notFound } from 'next/navigation';
+import { mockClients, mockCampaigns } from '@/lib/data';
+import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { CampaignCard } from '@/components/dashboard/campaign-card';
-import { mockClients, mockCampaigns } from '@/lib/data';
-import Image from 'next/image';
 
+// Esta página ahora es un Server Component.
 export default function ClientDetailPage({ params }: { params: { clientId: string } }) {
-  const client = mockClients.find(c => c.id === params.clientId);
-  const campaigns = mockCampaigns.filter(c => c.client.id === params.clientId);
+  const { clientId } = params;
+
+  const client = mockClients.find(c => c.id === clientId);
 
   if (!client) {
     notFound();
   }
+
+  const campaigns = mockCampaigns.filter(c => c.client.id === clientId);
 
   return (
     <div className="flex flex-col gap-8">
