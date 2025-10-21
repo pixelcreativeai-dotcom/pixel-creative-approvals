@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -19,6 +20,8 @@ import { useState } from 'react';
 
 export default function CreativeDetailPage({ params }: { params: { creativeId: string } }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // The creative object is needed for the page, so we find it first.
   const creative = mockCreatives.find(c => c.id === params.creativeId);
 
   if (!creative) {
@@ -81,3 +84,4 @@ export default function CreativeDetailPage({ params }: { params: { creativeId: s
     </Dialog>
   );
 }
+
