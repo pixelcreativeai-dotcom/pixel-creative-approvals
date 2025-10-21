@@ -41,7 +41,9 @@ const ValidateAssetOutputSchema = z.object({
 export type ValidateAssetOutput = z.infer<typeof ValidateAssetOutputSchema>;
 
 export async function validateAsset(input: ValidateAssetInput): Promise<ValidateAssetOutput> {
-  return validateAssetFlow(input);
+  const result = await validateAssetFlow(input);
+  // Ensure we always return a valid object, even if the flow returns nothing.
+  return result || { results: {} };
 }
 
 const validateAssetPrompt = ai.definePrompt({

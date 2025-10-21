@@ -37,7 +37,9 @@ export type SuggestCreativeCroppingOutput = z.infer<typeof SuggestCreativeCroppi
 export async function suggestCreativeCropping(
   input: SuggestCreativeCroppingInput
 ): Promise<SuggestCreativeCroppingOutput> {
-  return suggestCreativeCroppingFlow(input);
+  const result = await suggestCreativeCroppingFlow(input);
+  // Ensure we always return a valid object, even if the flow returns nothing.
+  return result || { suggestions: 'No se pudieron generar sugerencias.' };
 }
 
 const prompt = ai.definePrompt({
@@ -49,7 +51,7 @@ const prompt = ai.definePrompt({
 Asset: {{media url=assetDataUri}}
 Format Specifications: {{{formatSpecs}}}
 
-Provide clear and concise suggestions for cropping and resizing the asset to best fit the format specifications.`, // Added media support
+Provide clear and concise suggestions for cropping and resizing the asset to best fit the format specifications. The suggestions should be in Spanish.`,
 });
 
 const suggestCreativeCroppingFlow = ai.defineFlow(

@@ -33,13 +33,15 @@ export interface Campaign {
   progress: number;
 }
 
+export type CreativeStatus = 'draft' | 'review' | 'approved' | 'changes';
+
 export interface Creative {
     id: string;
     campaignId: string;
     title: string;
     description: string;
     platform: 'meta' | 'instagram' | 'facebook' | 'tiktok' | 'google';
-    status: 'draft' | 'review' | 'approved' | 'changes';
+    status: CreativeStatus;
     assetCount: number;
     updatedAt: string;
 }
@@ -55,6 +57,16 @@ export interface Variation {
   assetUrl: string;
   status: VariationStatus;
   updatedAt: string;
+}
+
+export interface FormatSpec {
+    platform: string;
+    name: string;
+    spec: string;
+    ideal: string;
+    min?: string;
+    ratio: string;
+    maxSizeKB?: number;
 }
 
 
@@ -123,7 +135,7 @@ export const mockVariations: Variation[] = [
 ];
 
 
-export const formatSpecs = [
+export const formatSpecs: FormatSpec[] = [
     // Meta / IG / FB
     { platform: 'Meta/IG/FB', name: 'Feed 1:1', spec: '1440x1440', ideal: '1440x1440', min: '600x600', ratio: '1:1', maxSizeKB: 30000 },
     { platform: 'Meta/IG/FB', name: 'Feed 4:5', spec: '1440x1800', ideal: '1440x1800', ratio: '4:5', maxSizeKB: 30000 },
@@ -138,12 +150,12 @@ export const formatSpecs = [
     { platform: 'Google Ads', name: 'Logo 4:1', spec: '1200x300', ideal: '1200x300', min: '512x128', ratio: '4:1', maxSizeKB: 5120 },
     
     // Google Ads (Banners estáticos)
-    { platform: 'Google Ads', name: 'Banner 300x250', spec: '300x250', ideal: '300x250', maxSizeKB: 150 },
-    { platform: 'Google Ads', name: 'Banner 336x280', spec: '336x280', ideal: '336x280', maxSizeKB: 150 },
-    { platform: 'Google Ads', name: 'Banner 728x90', spec: '728x90', ideal: '728x90', maxSizeKB: 150 },
-    { platform: 'Google Ads', name: 'Banner 160x600', spec: '160x600', ideal: '160x600', maxSizeKB: 150 },
-    { platform: 'Google Ads', name: 'Banner 300x600', spec: '300x600', ideal: '300x600', maxSizeKB: 150 },
-    { platform: 'Google Ads', name: 'Banner 970x250', spec: '970x250', ideal: '970x250', maxSizeKB: 150 },
+    { platform: 'Google Ads', name: 'Banner 300x250', spec: '300x250', ideal: '300x250', ratio: '1.2:1', maxSizeKB: 150 },
+    { platform: 'Google Ads', name: 'Banner 336x280', spec: '336x280', ideal: '336x280', ratio: '1.2:1', maxSizeKB: 150 },
+    { platform: 'Google Ads', name: 'Banner 728x90', spec: '728x90', ideal: '728x90', ratio: '8.09:1', maxSizeKB: 150 },
+    { platform: 'Google Ads', name: 'Banner 160x600', spec: '160x600', ideal: '160x600', ratio: '1:3.75', maxSizeKB: 150 },
+    { platform: 'Google Ads', name: 'Banner 300x600', spec: '300x600', ideal: '300x600', ratio: '1:2', maxSizeKB: 150 },
+    { platform: 'Google Ads', name: 'Banner 970x250', spec: '970x250', ideal: '970x250', ratio: '3.88:1', maxSizeKB: 150 },
     
     // TikTok
     { platform: 'TikTok', name: 'In-Feed 9:16', spec: '1080x1920', ideal: '1080x1920', ratio: '9:16', maxSizeKB: 200000 },

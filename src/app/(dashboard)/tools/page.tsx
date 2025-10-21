@@ -12,7 +12,7 @@ const tools = [
   {
     title: 'Sugerencias de Recorte (AI)',
     description: 'Recibe sugerencias de cropping y resizing para optimizar tus creativos.',
-    href: '#',
+    href: '/tools/cropping-suggestions',
     icon: Scale,
   },
 ];
