@@ -7,7 +7,11 @@ import { DashboardHeader } from "@/components/dashboard/header";
 import { useAuthRedirect } from "@/hooks/use-auth-redirect.tsx";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-  useAuthRedirect();
+  const authRedirectLoader = useAuthRedirect();
+
+  if (authRedirectLoader) {
+    return authRedirectLoader;
+  }
 
   return (
     <SidebarProvider>
