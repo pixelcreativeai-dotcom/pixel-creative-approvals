@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import type { Variation } from '@/lib/data';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -46,6 +47,12 @@ const getPreviewComponent = (formatKey: string, assetType: 'image' | 'video', as
 export function VariationCard({ variation }: { variation: Variation }) {
   const { id, formatKey, assetType, assetUrl, status, updatedAt } = variation;
   const config = statusConfig[status] || { label: 'Desconocido', className: 'bg-gray-200 text-gray-800' };
+  const [formattedDate, setFormattedDate] = useState('');
+
+  useEffect(() => {
+    setFormattedDate(new Date(updatedAt).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' }));
+  }, [updatedAt]);
+
 
   return (
     <Card className="flex flex-col transition-all hover:shadow-md group">
@@ -72,7 +79,7 @@ export function VariationCard({ variation }: { variation: Variation }) {
       <CardFooter className="p-4 pt-0 flex justify-between items-center text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4" />
-          <span>{new Date(updatedAt).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })}</span>
+          {formattedDate ? <span>{formattedDate}</span> : null}
         </div>
         <button>
             <MoreVertical className="h-4 w-4" />
