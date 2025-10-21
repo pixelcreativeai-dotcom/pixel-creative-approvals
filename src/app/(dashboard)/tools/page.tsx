@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ArrowRight, Scan, Scale } from 'lucide-react';
+import { ArrowRight, Scan, Scale, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
 const tools = [
@@ -10,10 +10,16 @@ const tools = [
     icon: Scan,
   },
   {
-    title: 'Sugerencias de Recorte (AI)',
+    title: 'Sugerencias de Recorte (IA)',
     description: 'Recibe sugerencias de cropping y resizing para optimizar tus creativos.',
     href: '/tools/cropping-suggestions',
     icon: Scale,
+  },
+  {
+    title: 'Generador de Variaciones (IA)',
+    description: 'Crea nuevas variaciones de tus assets usando IA para diferentes plataformas.',
+    href: '/tools/asset-generator',
+    icon: Sparkles,
   },
 ];
 
