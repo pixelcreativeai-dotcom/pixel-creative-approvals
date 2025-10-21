@@ -269,7 +269,6 @@ export function NewVariationForm({ creative, onFormSubmit }: NewVariationFormPro
                             !selectedFormatKey && 'cursor-not-allowed opacity-50',
                             uploadedFile && 'p-4'
                         )}
-                        onClick={(e) => { if (!selectedFormatKey) e.preventDefault(); }}
                     >
                         <input {...getInputProps()} disabled={!selectedFormatKey} />
                         {uploadedFile ? (
@@ -337,5 +336,3 @@ export function NewVariationForm({ creative, onFormSubmit }: NewVariationFormPro
     </Form>
   );
 }
-
-    
