@@ -3,15 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  BookImage,
   FolderKanban,
-  Home,
   LogOut,
   Settings,
   Users,
   Wrench,
+  Loader2,
 } from 'lucide-react';
-
+import { useAuth, useUser } from '@/firebase';
 import {
   Sidebar,
   SidebarContent,
@@ -20,9 +19,6 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarSeparator,
 } from '@/components/ui/sidebar';
 import {
@@ -41,14 +37,23 @@ import {
 import { PixelCreativeLogo } from '@/components/icons';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
-const userAvatar = PlaceHolderImages.find(p => p.id === 'user-avatar-1');
-
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const auth = useAuth();
+  const { user, isUserLoading } = useUser();
+
+  const handleLogout = () => {
+    auth.signOut();
+  };
 
   const isActive = (path: string) => {
     return pathname === path || pathname.startsWith(`${path}/`);
   };
+
+  const userAvatar = user?.photoURL || PlaceHolderImages.find(p => p.id === 'user-avatar-1')?.imageUrl;
+  const userName = user?.displayName || user?.email || 'Usuario';
+  const userEmail = user?.email || 'cargando...';
+  const userFallback = userName?.slice(0, 2).toUpperCase() || 'U';
 
   return (
     <Sidebar>
@@ -105,14 +110,18 @@ export function DashboardSidebar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className="flex-1 flex items-center gap-3 cursor-pointer">
-                <Avatar className="h-9 w-9">
-                  <AvatarImage src={userAvatar?.imageUrl} alt="Alicia Rodriguez" />
-                  <AvatarFallback>AR</AvatarFallback>
-                </Avatar>
+                {isUserLoading ? (
+                    <Loader2 className="size-9 animate-spin" />
+                ) : (
+                    <Avatar className="h-9 w-9">
+                        <AvatarImage src={userAvatar} alt={userName} />
+                        <AvatarFallback>{userFallback}</AvatarFallback>
+                    </Avatar>
+                )}
                 <div className="flex-1 overflow-hidden group-data-[collapsible=icon]:hidden">
-                  <p className="font-semibold text-sm truncate">Alicia Rodriguez</p>
+                  <p className="font-semibold text-sm truncate">{userName}</p>
                   <p className="text-xs text-muted-foreground truncate">
-                    alicia@pixelcreative.com
+                    {userEmail}
                   </p>
                 </div>
               </div>
@@ -125,7 +134,7 @@ export function DashboardSidebar() {
                 <span>Ajustes</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Cerrar sesión</span>
               </DropdownMenuItem>

@@ -1,9 +1,14 @@
+'use client';
+
 import type { ReactNode } from "react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { DashboardHeader } from "@/components/dashboard/header";
+import { useAuthRedirect } from "@/hooks/use-auth-redirect.tsx";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
+  useAuthRedirect();
+
   return (
     <SidebarProvider>
       <DashboardSidebar />

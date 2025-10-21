@@ -7,8 +7,6 @@ import {
   Home,
   PanelLeft,
   Search,
-  Settings,
-  User,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
@@ -21,14 +19,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useSidebar, SidebarTrigger } from '@/components/ui/sidebar';
@@ -45,7 +36,11 @@ function BreadcrumbResponsive() {
         'creatives': 'Creativos',
         'tools': 'Herramientas',
         'format-validator': 'Validador de Formatos',
+        'cropping-suggestions': 'Sugerencias de Recorte (IA)',
     }
+
+    // Don't show breadcrumbs for auth pages
+    if (segments[0] === 'login' || segments[0] === 'signup') return null;
 
     return (
       <Breadcrumb className="hidden md:flex">

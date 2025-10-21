@@ -210,7 +210,7 @@
       ]
     },
     "Comment": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$schema": "http://json-schema-org/draft-07/schema#",
       "title": "Comment",
       "type": "object",
       "description": "Represents a comment on a creative variation.",
