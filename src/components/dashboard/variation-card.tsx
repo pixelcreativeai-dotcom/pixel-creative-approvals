@@ -12,7 +12,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Clock, Image as ImageIcon, Video, MoreVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { MetaFeedPreview, InstagramStoryPreview, TikTokPreview } from '@/components/dashboard/previews';
+import { GoogleAdsPreview, InstagramStoryPreview, LinkedInFeedPreview, MetaFeedPreview, TikTokPreview } from '@/components/dashboard/previews';
 
 type VariationStatus = 'draft' | 'review' | 'approved' | 'changes';
 
@@ -39,6 +39,12 @@ const getPreviewComponent = (formatKey: string, assetType: 'image' | 'video', as
     }
     if (formatKey.toLowerCase().includes('tiktok')) {
         return <TikTokPreview {...props} />;
+    }
+    if (formatKey.toLowerCase().includes('linkedin')) {
+        return <LinkedInFeedPreview {...props} />;
+    }
+    if (formatKey.toLowerCase().includes('banner') || formatKey.toLowerCase().includes('logo') || formatKey.toLowerCase().includes('display') || formatKey.toLowerCase().includes('horizontal')) {
+        return <GoogleAdsPreview {...props} />;
     }
     // Default to Meta Feed for other formats like 1:1 or 4:5
     return <MetaFeedPreview {...props} />;

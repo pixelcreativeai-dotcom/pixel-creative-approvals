@@ -5,13 +5,13 @@ import { mockCampaigns, mockCreatives, mockVariations, type Creative } from '@/l
 import { CreativeDetailView } from '@/components/dashboard/creative-detail-view';
 
 type CreativeDetailPageProps = {
-  params: { creativeId: string };
+  params: Promise<{ creativeId: string }>;
 };
 
 // Esta página ahora es un Server Component.
 // Obtiene los datos en el servidor y se los pasa al Client Component.
-export default function CreativeDetailPage({ params }: CreativeDetailPageProps) {
-  const { creativeId } = params;
+export default async function CreativeDetailPage({ params }: CreativeDetailPageProps) {
+  const { creativeId } = await params;
 
   const creative = mockCreatives.find(c => c.id === creativeId);
 

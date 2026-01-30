@@ -10,9 +10,10 @@ import { CreativeCard } from '@/components/dashboard/creative-card';
 // Esta página ahora es un Server Component por defecto, lo cual es ideal para
 // obtener datos (data fetching).
 
-export default function CampaignDetailPage({ params }: { params: { campaignId: string } }) {
-  const campaign = mockCampaigns.find(c => c.id === params.campaignId);
-  const creatives = mockCreatives.filter(c => c.campaignId === params.campaignId);
+export default async function CampaignDetailPage({ params }: { params: Promise<{ campaignId: string }> }) {
+  const { campaignId } = await params;
+  const campaign = mockCampaigns.find(c => c.id === campaignId);
+  const creatives = mockCreatives.filter(c => c.campaignId === campaignId);
 
   if (!campaign) {
     notFound();
